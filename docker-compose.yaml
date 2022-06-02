@@ -1,0 +1,34 @@
+version : '3.3'
+services:
+  
+  # OT Collector
+  otel-collector:
+    image: otel/opentelemetry-collector:0.52.0
+    command: ["--config=/otel-config.yaml"]
+    environment: 
+      - HONEYCOMB_API_KEY=${HONEYCOMB_API_KEY}
+      - HONEYCOMB_TRACING_DATASET=${HONEYCOMB_TRACING_DATASET}
+      - HONEYCOMB_METRICS_DATASET=${HONEYCOMB_METRICS_DATASET}
+    volumes:
+      - type: bind
+        source: ${PWD}/otel-local-config.yaml
+        target: /otel-config.yaml
+        read_only: true
+      - type: bind
+        source: ${PWD}/logs/
+        target: /logs/
+    ports:
+      - "4317:4317"   # OTEL receiver
+
+  honeytail:
+    build: .
+    environment:
+      - HONEYCOMB_WRITE_KEY=${HONEYCOMB_API_KEY}
+      - HONEYCOMB_LOGS_DATASET=${HONEYCOMB_LOGS_DATASET}
+    volumes:
+      - type: bind
+        source: ${PWD}/logs/
+        target: /logs/
+        read_only: true
+    depends_on:
+      - otel-collector
