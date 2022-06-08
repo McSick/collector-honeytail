@@ -14,21 +14,15 @@ services:
         source: ${PWD}/otel-local-config.yaml
         target: /otel-config.yaml
         read_only: true
-      - type: bind
-        source: ${PWD}/logs/
-        target: /logs/
     ports:
       - "4317:4317"   # OTEL receiver
 
-  honeytail:
+  otlp-log-receiver:
     build: .
     environment:
-      - HONEYCOMB_WRITE_KEY=${HONEYCOMB_API_KEY}
-      - HONEYCOMB_LOGS_DATASET=${HONEYCOMB_LOGS_DATASET}
-    volumes:
-      - type: bind
-        source: ${PWD}/logs/
-        target: /logs/
-        read_only: true
+      - HONEYCOMB_API_KEY=${HONEYCOMB_API_KEY}
+      - HONEYCOMB_DATASET=${HONEYCOMB_TRACING_DATASET}
     depends_on:
       - otel-collector
+    ports:
+      - "8080:8080"   # OTEL Logs receiver

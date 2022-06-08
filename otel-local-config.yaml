@@ -21,8 +21,8 @@ exporters:
     headers:
       "x-honeycomb-team": "${HONEYCOMB_API_KEY}"
       "x-honeycomb-dataset": "${HONEYCOMB_METRICS_DATASET}"
-  file:
-    path: /logs/collector-logs.json
+  otlphttp:
+    endpoint: "http://docker.for.mac.localhost:8080"
 
 service:
   pipelines:
@@ -37,4 +37,4 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, file]
+      exporters: [logging, otlphttp]
